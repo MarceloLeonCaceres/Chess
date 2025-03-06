@@ -5,17 +5,17 @@ public class GameState
     public Player CurrentPlayer { get; private set; }
     public Result Result { get; private set; } = null;
 
-    private int noCaptureOrPawnMoves = 0;
-    private string stateString;
-    private readonly Dictionary<string, int> stateHistory = new Dictionary<string, int>();
+    private int _noCaptureOrPawnMoves = 0;
+    private string _stateString;
+    private readonly Dictionary<string, int> _stateHistory = new Dictionary<string, int>();
 
     public GameState(Player player, Board board)
     {
         CurrentPlayer = player;
         Board = board;
 
-        stateString = new StateString(CurrentPlayer, board).ToString();
-        stateHistory[stateString] = 1;
+        _stateString = new StateString(CurrentPlayer, board).ToString();
+        _stateHistory[_stateString] = 1;
     }
     public IEnumerable<Move> LegalMovesForPiece(Square pos)
     {
@@ -36,13 +36,13 @@ public class GameState
 
         if (captureOrPawn)
         {
-            noCaptureOrPawnMoves = 0;
+            _noCaptureOrPawnMoves = 0;
             // Borra la historia ?!
-            stateHistory.Clear();
+            _stateHistory.Clear();
         }
         else
         {
-            noCaptureOrPawnMoves++;
+            _noCaptureOrPawnMoves++;
         }
 
         CurrentPlayer = CurrentPlayer.Opponent();
@@ -95,25 +95,25 @@ public class GameState
 
     private bool FiftyMoveRule()
     {
-        int fullMoves = noCaptureOrPawnMoves / 2;
+        int fullMoves = _noCaptureOrPawnMoves / 2;
         return fullMoves == 50;
     }
 
     private void UpdateStateString()
     {
-        stateString = new StateString(CurrentPlayer, Board).ToString();
-        if (!stateHistory.ContainsKey(stateString))
+        _stateString = new StateString(CurrentPlayer, Board).ToString();
+        if (!_stateHistory.ContainsKey(_stateString))
         {
-            stateHistory[stateString] = 1;
+            _stateHistory[_stateString] = 1;
         }
         else
         {
-            stateHistory[stateString]++;
+            _stateHistory[_stateString]++;
         }
     }
 
     private bool ThreefoldRepetition()
     {
-        return stateHistory[stateString] == 3;
+        return _stateHistory[_stateString] == 3;
     }
 }
