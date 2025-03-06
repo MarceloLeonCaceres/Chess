@@ -14,7 +14,7 @@ public class Knight : Piece
         copy.HasMoved = HasMoved;
         return copy;
     }
-    private static IEnumerable<Position> PotentialToPositions(Position from)
+    private static IEnumerable<Square> PotentialToPositions(Square from)
     {
         foreach(Direction vDir in new Direction[] { Direction.North, Direction.South })
         {
@@ -26,14 +26,14 @@ public class Knight : Piece
         }
     }
 
-    private IEnumerable<Position> MovePositions(Position from, Board board)
+    private IEnumerable<Square> MovePositions(Square from, Board board)
     {
         return PotentialToPositions(from).Where(
             pos => Board.IsInside(pos) && 
             (board.IsEmpty(pos) || board[pos].Color != Color));
     }
 
-    public override IEnumerable<Move> GetMoves(Position from, Board board)
+    public override IEnumerable<Move> GetMoves(Square from, Board board)
     {
         return MovePositions(from, board).Select(to => new NormalMove(from, to));
     }

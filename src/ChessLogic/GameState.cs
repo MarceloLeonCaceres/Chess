@@ -17,7 +17,7 @@ public class GameState
         stateString = new StateString(CurrentPlayer, board).ToString();
         stateHistory[stateString] = 1;
     }
-    public IEnumerable<Move> LegalMovesForPiece(Position pos)
+    public IEnumerable<Move> LegalMovesForPiece(Square pos)
     {
         if(Board.IsEmpty(pos) || Board[pos].Color != CurrentPlayer)
         {

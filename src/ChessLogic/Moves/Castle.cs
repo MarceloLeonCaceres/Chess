@@ -3,15 +3,15 @@ public class Castle : Move
 {
     public override MoveType Type { get; }
 
-    public override Position FromPos { get; }
+    public override Square FromPos { get; }
 
-    public override Position ToPos { get; }
+    public override Square ToPos { get; }
 
     private readonly Direction kingMoveDir;
-    private readonly Position rookFromPos;
-    private readonly Position rookToPos;
+    private readonly Square rookFromPos;
+    private readonly Square rookToPos;
 
-    public Castle(MoveType type, Position kingPos)
+    public Castle(MoveType type, Square kingPos)
     {
         Type = type;
         FromPos = kingPos;
@@ -19,16 +19,16 @@ public class Castle : Move
         if(type == MoveType.CastleKS)
         {
             kingMoveDir = Direction.East;
-            ToPos = new Position(kingPos.Row, 6);
-            rookFromPos = new Position(kingPos.Row, 7);
-            rookToPos = new Position(kingPos.Row, 5);
+            ToPos = new Square(kingPos.Row, 6);
+            rookFromPos = new Square(kingPos.Row, 7);
+            rookToPos = new Square(kingPos.Row, 5);
         }
         else
         {
             kingMoveDir = Direction.West;
-            ToPos = new Position(kingPos.Row, 2);
-            rookFromPos = new Position(kingPos.Row, 0);
-            rookToPos = new Position(kingPos.Row, 3);
+            ToPos = new Square(kingPos.Row, 2);
+            rookFromPos = new Square(kingPos.Row, 0);
+            rookToPos = new Square(kingPos.Row, 3);
         }
     }
     public override bool Execute(Board board)
@@ -48,7 +48,7 @@ public class Castle : Move
         }
 
         Board copy = board.Copy();
-        Position kingPosInCopy = FromPos;
+        Square kingPosInCopy = FromPos;
 
         for(int i = 0; i < 2; i++)
         {

@@ -5,7 +5,7 @@ public class Board
 {
     private readonly Piece[,] pieces = new Piece[8, 8];
 
-    private readonly Dictionary<Player, Position> pawnSkipPositions = new Dictionary<Player, Position>
+    private readonly Dictionary<Player, Square> pawnSkipPositions = new Dictionary<Player, Square>
     {
         {Player.White, null },
         {Player.Black, null }
@@ -16,16 +16,16 @@ public class Board
         set { pieces[row, col] = value; }
     }
 
-    public Position GetPawnSkipPosition(Player player)
+    public Square GetPawnSkipPosition(Player player)
     {
         return pawnSkipPositions[player];
     }
-    public void SetPawnSkipPosition(Player player, Position pos)
+    public void SetPawnSkipPosition(Player player, Square pos)
     {
         pawnSkipPositions[player] = pos;
     }
 
-    public Piece this[Position pos]
+    public Piece this[Square pos]
     {
         get { return this[pos.Row, pos.Column]; }
         set { this[pos.Row, pos.Column] = value; }
@@ -73,23 +73,23 @@ public class Board
         }
     }
 
-    public static bool IsInside(Position pos)
+    public static bool IsInside(Square pos)
     {
         return pos.Row >= 0 && pos.Row < 8 && pos.Column >= 0 && pos.Column < 8;
     }
 
-    public bool IsEmpty(Position pos)
+    public bool IsEmpty(Square pos)
     {
         return this[pos] == null;
     }
 
-    public IEnumerable<Position> PiecePositions()
+    public IEnumerable<Square> PiecePositions()
     {
         for(int r = 0; r < 8; r++)
         {
             for(int c = 0; c < 8; c++)
             {
-                Position pos = new Position(r, c);
+                Square pos = new Square(r, c);
 
                 if (!IsEmpty(pos))
                 {
@@ -99,7 +99,7 @@ public class Board
         }
     }
 
-    public IEnumerable<Position> PiecePositionsFor(Player player)
+    public IEnumerable<Square> PiecePositionsFor(Player player)
     {
         return PiecePositions().Where(pos => this[pos].Color == player);
     }
@@ -117,7 +117,7 @@ public class Board
     {
         Board copy = new Board();
 
-        foreach(Position pos in PiecePositions())
+        foreach(Square pos in PiecePositions())
         {
             copy[pos] = this[pos].Copy();
         }
@@ -128,7 +128,7 @@ public class Board
     {
         Counting counting = new Counting();
 
-        foreach(Position pos in PiecePositions())
+        foreach(Square pos in PiecePositions())
         {
             Piece piece = this[pos];
             counting.Increment(piece.Color, piece.Type);
@@ -173,18 +173,18 @@ public class Board
             return false;
         }
 
-        Position wBishopPos = FindPiece(Player.White, PieceType.Bishop);
-        Position bBishopPos = FindPiece(Player.Black, PieceType.Bishop);
+        Square wBishopPos = FindPiece(Player.White, PieceType.Bishop);
+        Square bBishopPos = FindPiece(Player.Black, PieceType.Bishop);
 
         return wBishopPos.SquareColor() == bBishopPos.SquareColor();
     }
 
-    private Position FindPiece(Player color, PieceType type)
+    private Square FindPiece(Player color, PieceType type)
     {
         return PiecePositionsFor(color).First(pos => this[pos].Type == type);
     }
 
-    private bool IsUnmovedKingAndRook(Position kingPos, Position rookPos)
+    private bool IsUnmovedKingAndRook(Square kingPos, Square rookPos)
     {
         if(IsEmpty(kingPos) || IsEmpty(rookPos))
         {
@@ -202,8 +202,8 @@ public class Board
     {
         return player switch
         {
-            Player.White => IsUnmovedKingAndRook(new Position(7, 4), new Position(7, 7)),
-            Player.Black => IsUnmovedKingAndRook(new Position(0, 4), new Position(0, 7)),
+            Player.White => IsUnmovedKingAndRook(new Square(7, 4), new Square(7, 7)),
+            Player.Black => IsUnmovedKingAndRook(new Square(0, 4), new Square(0, 7)),
             _ => false
         };
     }
@@ -211,15 +211,15 @@ public class Board
     {
         return player switch
         {
-            Player.White => IsUnmovedKingAndRook(new Position(7, 4), new Position(7, 0)),
-            Player.Black => IsUnmovedKingAndRook(new Position(0, 4), new Position(0, 0)),
+            Player.White => IsUnmovedKingAndRook(new Square(7, 4), new Square(7, 0)),
+            Player.Black => IsUnmovedKingAndRook(new Square(0, 4), new Square(0, 0)),
             _ => false
         };
     }
 
-    private bool HasPawnInPosition(Player player, Position[] pawnPositions, Position skipPos)
+    private bool HasPawnInPosition(Player player, Square[] pawnPositions, Square skipPos)
     {
-        foreach(Position pos in pawnPositions.Where(IsInside))
+        foreach(Square pos in pawnPositions.Where(IsInside))
         {
             Piece piece = this[pos];
             if(piece == null || piece.Color != player || piece.Type != PieceType.Pawn)
@@ -238,17 +238,17 @@ public class Board
     }
     public bool CanCaptureEnPassant(Player player)
     {
-        Position skipPos = GetPawnSkipPosition(player.Opponent());
+        Square skipPos = GetPawnSkipPosition(player.Opponent());
         if(skipPos == null)
         {
             return false;
         }
 
-        Position[] pawnPositions = player switch
+        Square[] pawnPositions = player switch
         {
-            Player.White => new Position[] { skipPos + Direction.SouthWest, skipPos + Direction.SouthEast },
-            Player.Black => new Position[] { skipPos + Direction.NorthWest, skipPos + Direction.NorthEast },
-            _ => Array.Empty<Position>()
+            Player.White => new Square[] { skipPos + Direction.SouthWest, skipPos + Direction.SouthEast },
+            Player.Black => new Square[] { skipPos + Direction.NorthWest, skipPos + Direction.NorthEast },
+            _ => Array.Empty<Square>()
         };
 
         return HasPawnInPosition(player, pawnPositions, skipPos);

@@ -4,16 +4,16 @@ public class EnPassant : Move
 {
     public override MoveType Type => MoveType.EnPassant;
 
-    public override Position FromPos { get; }
+    public override Square FromPos { get; }
 
-    public override Position ToPos { get; }
+    public override Square ToPos { get; }
 
-    private readonly Position capturePos;
-    public EnPassant(Position from, Position to)
+    private readonly Square capturePos;
+    public EnPassant(Square from, Square to)
     {
         FromPos = from;
         ToPos = to;
-        capturePos = new Position(from.Row, to.Column);
+        capturePos = new Square(from.Row, to.Column);
     }
     public override bool Execute(Board board)
     {

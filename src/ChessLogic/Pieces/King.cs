@@ -19,7 +19,7 @@ public class King : Piece
         Color = color;
     }
 
-    private static bool IsUnmovedRook(Position pos, Board board)
+    private static bool IsUnmovedRook(Square pos, Board board)
     {
         if (board.IsEmpty(pos))
         {
@@ -30,31 +30,31 @@ public class King : Piece
         return piece.Type == PieceType.Rook && !piece.HasMoved;
     }
 
-    private static bool AllEmpty(IEnumerable<Position> positions, Board board)
+    private static bool AllEmpty(IEnumerable<Square> positions, Board board)
     {
         return positions.All(pos => board.IsEmpty(pos));
     }
 
-    private bool CanCastleKingSide(Position from, Board board)
+    private bool CanCastleKingSide(Square from, Board board)
     {
         if (HasMoved)
         {
             return false;
         }
-        Position rookPos = new Position(from.Row, 7);
-        Position[] betweenPositions = new Position[] { new(from.Row, 5), new(from.Row, 6) };
+        Square rookPos = new Square(from.Row, 7);
+        Square[] betweenPositions = new Square[] { new(from.Row, 5), new(from.Row, 6) };
         return IsUnmovedRook(rookPos, board) && AllEmpty(betweenPositions, board);
 
     }
 
-    private bool CanCastleQueenSide(Position from, Board board)
+    private bool CanCastleQueenSide(Square from, Board board)
     {
         if (HasMoved)
         {
             return false;
         }
-        Position rookPos = new Position(from.Row, 0);
-        Position[] betweenPositions = new Position[] { new(from.Row, 1), new(from.Row, 2), new(from.Row, 3) };
+        Square rookPos = new Square(from.Row, 0);
+        Square[] betweenPositions = new Square[] { new(from.Row, 1), new(from.Row, 2), new(from.Row, 3) };
         return IsUnmovedRook(rookPos, board) && AllEmpty(betweenPositions, board);
 
     }
@@ -65,11 +65,11 @@ public class King : Piece
         copy.HasMoved = HasMoved;
         return copy;
     }
-    private IEnumerable<Position> MovePositions(Position from, Board board)
+    private IEnumerable<Square> MovePositions(Square from, Board board)
     {
         foreach(var dir in _dirs)
         {
-            Position to = from + dir;
+            Square to = from + dir;
             if (!Board.IsInside(to))
             {
                 continue;
@@ -81,9 +81,9 @@ public class King : Piece
         }
     }
 
-    public override IEnumerable<Move> GetMoves(Position from, Board board)
+    public override IEnumerable<Move> GetMoves(Square from, Board board)
     {
-        foreach(Position to in MovePositions(from, board))
+        foreach(Square to in MovePositions(from, board))
         {
             yield return new NormalMove(from, to);
         }
@@ -97,7 +97,7 @@ public class King : Piece
             yield return new Castle(MoveType.CastleQS, from);
         }
     }
-    public override bool CanCaptureOpponentKing(Position from, Board board)
+    public override bool CanCaptureOpponentKing(Square from, Board board)
     {
         return MovePositions(from, board).Any(to =>
         {

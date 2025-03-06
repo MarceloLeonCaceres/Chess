@@ -3,11 +3,11 @@ public class NormalMove : Move
 {
     public override MoveType Type => MoveType.Normal;
 
-    public override Position FromPos { get; }
+    public override Square FromPos { get; }
 
-    public override Position ToPos { get; }
+    public override Square ToPos { get; }
 
-    public NormalMove(Position from, Position to)
+    public NormalMove(Square from, Square to)
     {
         FromPos = from;
         ToPos = to;

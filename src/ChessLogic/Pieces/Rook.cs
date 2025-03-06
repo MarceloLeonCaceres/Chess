@@ -21,7 +21,7 @@ public class Rook : Piece
         copy.HasMoved = HasMoved;
         return copy;
     }
-    public override IEnumerable<Move> GetMoves(Position from, Board board)
+    public override IEnumerable<Move> GetMoves(Square from, Board board)
     {
         return MovePositionsInDirs(from, board, dirs).Select(to => new NormalMove(from, to));
     }

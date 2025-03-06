@@ -13,10 +13,10 @@ public partial class MainWindow : Window
 {
     private readonly Image[,] pieceImages = new Image[8, 8];
     private readonly Rectangle[,] highlights = new Rectangle[8, 8];
-    private readonly Dictionary<Position, Move> moveCache = new Dictionary<Position, Move>();
+    private readonly Dictionary<Square, Move> moveCache = new Dictionary<Square, Move>();
 
     private GameState gameState;
-    private Position selectedPos = null;
+    private Square selectedPos = null;
 
     public MainWindow()
     {
@@ -65,7 +65,7 @@ public partial class MainWindow : Window
         }
 
         Point point = e.GetPosition(BoardGrid);
-        Position pos = ToSquarePosition(point);
+        Square pos = ToSquarePosition(point);
         if (selectedPos == null)
         {
             OnFromPositionSelected(pos);
@@ -76,7 +76,7 @@ public partial class MainWindow : Window
         }
     }
 
-    private void OnToPositionSelected(Position pos)
+    private void OnToPositionSelected(Square pos)
     {
         selectedPos = null;
         HideHighlights();
@@ -94,7 +94,7 @@ public partial class MainWindow : Window
         }
     }
 
-    private void HandlePromotion(Position from, Position to)
+    private void HandlePromotion(Square from, Square to)
     {
         pieceImages[to.Row, to.Column].Source = Images.GetImage(gameState.CurrentPlayer, PieceType.Pawn);
         pieceImages[from.Row, from.Column].Source = null;
@@ -122,7 +122,7 @@ public partial class MainWindow : Window
         }
     }
 
-    private void OnFromPositionSelected(Position pos)
+    private void OnFromPositionSelected(Square pos)
     {
         IEnumerable<Move> moves = gameState.LegalMovesForPiece(pos);
         if (moves.Any())
@@ -133,12 +133,12 @@ public partial class MainWindow : Window
         }
     }
 
-    private Position ToSquarePosition(Point point)
+    private Square ToSquarePosition(Point point)
     {
         double squareSize = BoardGrid.ActualWidth / 8;
         int row = (int)(point.Y / squareSize);
         int col = (int)(point.X / squareSize);
-        return new Position(row, col);
+        return new Square(row, col);
     }
     private void CacheMoves(IEnumerable<Move> moves)
     {
@@ -152,7 +152,7 @@ public partial class MainWindow : Window
     private void ShowHighlights()
     {
         Color color = Color.FromArgb(150, 125, 255, 125);
-        foreach (Position to in moveCache.Keys)
+        foreach (Square to in moveCache.Keys)
         {
             highlights[to.Row, to.Column].Fill = new SolidColorBrush(color);
         }
@@ -160,7 +160,7 @@ public partial class MainWindow : Window
 
     private void HideHighlights()
     {
-        foreach (Position to in moveCache.Keys)
+        foreach (Square to in moveCache.Keys)
         {
             highlights[to.Row, to.Column].Fill = Brushes.Transparent;
         }

@@ -24,11 +24,11 @@ public class Pawn : Piece
         copy.HasMoved = HasMoved;
         return copy;
     }
-    private static bool CanMoveTo(Position pos, Board board)
+    private static bool CanMoveTo(Square pos, Board board)
     {
         return Board.IsInside(pos) && board.IsEmpty(pos);
     }
-    private bool CanCaptureAt(Position pos, Board board)
+    private bool CanCaptureAt(Square pos, Board board)
     {
         if (!Board.IsInside(pos) || board.IsEmpty(pos))
         {
@@ -37,7 +37,7 @@ public class Pawn : Piece
         return board[pos].Color != Color;
     }
 
-    private static IEnumerable<Move> PromotionMoves(Position from, Position to)
+    private static IEnumerable<Move> PromotionMoves(Square from, Square to)
     {
         yield return new PawnPromotion(from, to, PieceType.Knight);
         yield return new PawnPromotion(from, to, PieceType.Bishop);
@@ -45,9 +45,9 @@ public class Pawn : Piece
         yield return new PawnPromotion(from, to, PieceType.Queen);
     }
 
-    private IEnumerable<Move> ForwardsMove(Position from, Board board)
+    private IEnumerable<Move> ForwardsMove(Square from, Board board)
     {
-        Position oneMovePos = from + _forward;
+        Square oneMovePos = from + _forward;
         if (CanMoveTo(oneMovePos, board))
         {
             if(oneMovePos.Row == 0 || oneMovePos.Row == 7)
@@ -62,7 +62,7 @@ public class Pawn : Piece
                 yield return new NormalMove(from, oneMovePos);
             }
 
-            Position twoMovesPos = oneMovePos + _forward;
+            Square twoMovesPos = oneMovePos + _forward;
 
             if (!HasMoved && CanMoveTo(twoMovesPos, board))
             {
@@ -70,11 +70,11 @@ public class Pawn : Piece
             }
         }
     }
-    private IEnumerable<Move> DiagonalMoves(Position from, Board board)
+    private IEnumerable<Move> DiagonalMoves(Square from, Board board)
     {
         foreach (Direction dir in new Direction[] { Direction.West, Direction.East })
         {
-            Position to = from + _forward + dir;
+            Square to = from + _forward + dir;
 
             if (to == board.GetPawnSkipPosition(Color.Opponent()))
             {
@@ -96,12 +96,12 @@ public class Pawn : Piece
             }
         }
     }
-    public override IEnumerable<Move> GetMoves(Position from, Board board)
+    public override IEnumerable<Move> GetMoves(Square from, Board board)
     {
         return ForwardsMove(from, board).Concat(DiagonalMoves(from, board));
     }
 
-    public override bool CanCaptureOpponentKing(Position from, Board board)
+    public override bool CanCaptureOpponentKing(Square from, Board board)
     {
         return DiagonalMoves(from, board).Any(move =>
         {
