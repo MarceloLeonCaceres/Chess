@@ -1,41 +1,39 @@
-﻿using System.Runtime.CompilerServices;
-
-namespace ChessLogic;
+﻿namespace ChessLogic;
 public class Board
 {
-    private readonly Piece[,] pieces = new Piece[8, 8];
+    private readonly Piece[,] _pieces = new Piece[8, 8];
 
-    private readonly Dictionary<Player, Square> pawnSkipPositions = new Dictionary<Player, Square>
+    private readonly Dictionary<Player, Square> _pawnSkipPositions = new Dictionary<Player, Square>
     {
         {Player.White, null },
         {Player.Black, null }
     };
     public Piece this[int row, int col]
     {
-        get { return pieces[row, col]; }
-        set { pieces[row, col] = value; }
+        get { return _pieces[row, col]; }
+        set { _pieces[row, col] = value; }
     }
 
     public Square GetPawnSkipPosition(Player player)
     {
-        return pawnSkipPositions[player];
+        return _pawnSkipPositions[player];
     }
-    public void SetPawnSkipPosition(Player player, Square pos)
+    public void SetPawnSkipPosition(Player player, Square casilla)
     {
-        pawnSkipPositions[player] = pos;
+        _pawnSkipPositions[player] = casilla;
     }
 
-    public Piece this[Square pos]
+    public Piece this[Square casilla]
     {
-        get { return this[pos.Row, pos.Column]; }
-        set { this[pos.Row, pos.Column] = value; }
+        get { return this[casilla.Row, casilla.Column]; }
+        set { this[casilla.Row, casilla.Column] = value; }
     }
 
     public static Board Initial()
     {
         Board board = new Board();
-        board.AddStartPieces();
-        //board.Ejercicio_1();
+        //board.AddStartPieces();
+        board.Ejercicio_1();
         return board;
     }
     public void Ejercicio_1()
@@ -66,34 +64,34 @@ public class Board
         this[7, 6] = new Knight(Player.White);
         this[7, 7] = new Rook(Player.White);
 
-        for(int i = 0; i < 8; i++)
+        for (int i = 0; i < 8; i++)
         {
-            this[1,i] = new Pawn(Player.Black);
-            this[6,i] = new Pawn(Player.White);
+            this[1, i] = new Pawn(Player.Black);
+            this[6, i] = new Pawn(Player.White);
         }
     }
 
-    public static bool IsInside(Square pos)
+    public static bool IsInside(Square casilla)
     {
-        return pos.Row >= 0 && pos.Row < 8 && pos.Column >= 0 && pos.Column < 8;
+        return casilla.Row >= 0 && casilla.Row < 8 && casilla.Column >= 0 && casilla.Column < 8;
     }
 
-    public bool IsEmpty(Square pos)
+    public bool IsEmpty(Square casilla)
     {
-        return this[pos] == null;
+        return this[casilla] == null;
     }
 
     public IEnumerable<Square> PiecePositions()
     {
-        for(int r = 0; r < 8; r++)
+        for (int r = 0; r < 8; r++)
         {
-            for(int c = 0; c < 8; c++)
+            for (int c = 0; c < 8; c++)
             {
-                Square pos = new Square(r, c);
+                Square casilla = new Square(r, c);
 
-                if (!IsEmpty(pos))
+                if (!IsEmpty(casilla))
                 {
-                    yield return pos;
+                    yield return casilla;
                 }
             }
         }
@@ -101,15 +99,15 @@ public class Board
 
     public IEnumerable<Square> PiecePositionsFor(Player player)
     {
-        return PiecePositions().Where(pos => this[pos].Color == player);
+        return PiecePositions().Where(cas => this[cas].Color == player);
     }
 
     public bool IsInCheck(Player player)
     {
-        return PiecePositionsFor(player.Opponent()).Any(pos =>
+        return PiecePositionsFor(player.Opponent()).Any(cas =>
         {
-            Piece piece = this[pos];
-            return piece.CanCaptureOpponentKing(pos, this);
+            Piece piece = this[cas];
+            return piece.CanCaptureOpponentKing(cas, this);
         });
     }
 
@@ -117,9 +115,9 @@ public class Board
     {
         Board copy = new Board();
 
-        foreach(Square pos in PiecePositions())
+        foreach (Square casilla in PiecePositions())
         {
-            copy[pos] = this[pos].Copy();
+            copy[casilla] = this[casilla].Copy();
         }
         return copy;
     }
@@ -128,9 +126,9 @@ public class Board
     {
         Counting counting = new Counting();
 
-        foreach(Square pos in PiecePositions())
+        foreach (var casilla in PiecePositions())
         {
-            Piece piece = this[pos];
+            Piece piece = this[casilla];
             counting.Increment(piece.Color, piece.Type);
         }
 
@@ -152,8 +150,8 @@ public class Board
 
     private static bool IsKingBishopVKing(Counting counting)
     {
-        return counting.TotalCount == 3 && 
-            (counting.White(PieceType.Bishop) == 1 || counting.Black(PieceType.Bishop) == 1); 
+        return counting.TotalCount == 3 &&
+            (counting.White(PieceType.Bishop) == 1 || counting.Black(PieceType.Bishop) == 1);
     }
 
     private static bool IsKingKnightVKing(Counting counting)
@@ -163,7 +161,7 @@ public class Board
     }
     private bool IsKingBishopVKingBishop(Counting counting)
     {
-        if(counting.TotalCount != 4)
+        if (counting.TotalCount != 4)
         {
             return false;
         }
@@ -186,14 +184,14 @@ public class Board
 
     private bool IsUnmovedKingAndRook(Square kingPos, Square rookPos)
     {
-        if(IsEmpty(kingPos) || IsEmpty(rookPos))
+        if (IsEmpty(kingPos) || IsEmpty(rookPos))
         {
             return false;
         }
-        
+
         Piece king = this[kingPos];
         Piece rook = this[rookPos];
-        
+
         return king.Type == PieceType.King && rook.Type == PieceType.Rook && !king.HasMoved && !rook.HasMoved;
 
     }
@@ -219,15 +217,15 @@ public class Board
 
     private bool HasPawnInPosition(Player player, Square[] pawnPositions, Square skipPos)
     {
-        foreach(Square pos in pawnPositions.Where(IsInside))
+        foreach (Square casilla in pawnPositions.Where(IsInside))
         {
-            Piece piece = this[pos];
-            if(piece == null || piece.Color != player || piece.Type != PieceType.Pawn)
+            Piece piece = this[casilla];
+            if (piece == null || piece.Color != player || piece.Type != PieceType.Pawn)
             {
                 continue;
             }
 
-            EnPassant move = new EnPassant(pos, skipPos);
+            EnPassant move = new EnPassant(casilla, skipPos);
             if (move.IsLegal(this))
             {
                 return true;
@@ -238,19 +236,19 @@ public class Board
     }
     public bool CanCaptureEnPassant(Player player)
     {
-        Square skipPos = GetPawnSkipPosition(player.Opponent());
-        if(skipPos == null)
+        Square skipCasilla = GetPawnSkipPosition(player.Opponent());
+        if (skipCasilla == null)
         {
             return false;
         }
 
         Square[] pawnPositions = player switch
         {
-            Player.White => new Square[] { skipPos + Direction.SouthWest, skipPos + Direction.SouthEast },
-            Player.Black => new Square[] { skipPos + Direction.NorthWest, skipPos + Direction.NorthEast },
+            Player.White => new Square[] { skipCasilla + Direction.SouthWest, skipCasilla + Direction.SouthEast },
+            Player.Black => new Square[] { skipCasilla + Direction.NorthWest, skipCasilla + Direction.NorthEast },
             _ => Array.Empty<Square>()
         };
 
-        return HasPawnInPosition(player, pawnPositions, skipPos);
+        return HasPawnInPosition(player, pawnPositions, skipCasilla);
     }
 }
