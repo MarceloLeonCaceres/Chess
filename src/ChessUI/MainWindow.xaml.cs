@@ -11,21 +11,21 @@ namespace ChessUI;
 /// </summary>
 public partial class MainWindow : Window
 {
-    private readonly Image[,] pieceImages = new Image[8, 8];
-    private readonly Rectangle[,] highlights = new Rectangle[8, 8];
-    private readonly Dictionary<Square, Move> moveCache = new Dictionary<Square, Move>();
+    private readonly Image[,] _pieceImages = new Image[8, 8];
+    private readonly Rectangle[,] _highlights = new Rectangle[8, 8];
+    private readonly Dictionary<Square, Move> _moveCache = new Dictionary<Square, Move>();
 
-    private GameState gameState;
-    private Square selectedPos = null;
+    private GameState _gameState;
+    private Square _selectedCasilla = null;
 
     public MainWindow()
     {
         InitializeComponent();
         InitializeBoard();
 
-        gameState = new GameState(Player.White, Board.Initial());
-        DrawBoard(gameState.Board);
-        SetCursor(gameState.CurrentPlayer);
+        _gameState = new GameState(Player.White, Board.Initial());
+        DrawBoard(_gameState.Board);
+        SetCursor(_gameState.CurrentPlayer);
     }
 
     private void InitializeBoard()
@@ -35,11 +35,11 @@ public partial class MainWindow : Window
             for (int c = 0; c < 8; c++)
             {
                 Image image = new Image();
-                pieceImages[r, c] = image;
+                _pieceImages[r, c] = image;
                 PieceGrid.Children.Add(image);
 
                 Rectangle highlight = new Rectangle();
-                highlights[r, c] = highlight;
+                _highlights[r, c] = highlight;
                 HighlightGrid.Children.Add(highlight);
             }
         }
@@ -52,7 +52,7 @@ public partial class MainWindow : Window
             for (int c = 0; c < 8; c++)
             {
                 Piece piece = board[r, c];
-                pieceImages[r, c].Source = Images.GetImage(piece);
+                _pieceImages[r, c].Source = Images.GetImage(piece);
             }
         }
     }
@@ -66,7 +66,7 @@ public partial class MainWindow : Window
 
         Point point = e.GetPosition(BoardGrid);
         Square pos = ToSquarePosition(point);
-        if (selectedPos == null)
+        if (_selectedCasilla == null)
         {
             OnFromPositionSelected(pos);
         }
@@ -78,10 +78,10 @@ public partial class MainWindow : Window
 
     private void OnToPositionSelected(Square pos)
     {
-        selectedPos = null;
+        _selectedCasilla = null;
         HideHighlights();
 
-        if (moveCache.TryGetValue(pos, out Move move))
+        if (_moveCache.TryGetValue(pos, out Move move))
         {
             if(move.Type == MoveType.PawnPromotion)
             {
@@ -96,10 +96,10 @@ public partial class MainWindow : Window
 
     private void HandlePromotion(Square from, Square to)
     {
-        pieceImages[to.Row, to.Column].Source = Images.GetImage(gameState.CurrentPlayer, PieceType.Pawn);
-        pieceImages[from.Row, from.Column].Source = null;
+        _pieceImages[to.Row, to.Column].Source = Images.GetImage(_gameState.CurrentPlayer, PieceType.Pawn);
+        _pieceImages[from.Row, from.Column].Source = null;
 
-        PromotionMenu promMenu = new PromotionMenu(gameState.CurrentPlayer);
+        PromotionMenu promMenu = new PromotionMenu(_gameState.CurrentPlayer);
         MenuContainer.Content = promMenu;
 
         promMenu.PieceSelected += type =>
@@ -112,11 +112,11 @@ public partial class MainWindow : Window
 
     private void HandleMove(Move move)
     {
-        gameState.MakeMove(move);
-        DrawBoard(gameState.Board);
-        SetCursor(gameState.CurrentPlayer);
+        _gameState.MakeMove(move);
+        DrawBoard(_gameState.Board);
+        SetCursor(_gameState.CurrentPlayer);
 
-        if (gameState.IsGameOver())
+        if (_gameState.IsGameOver())
         {
             ShowGameOver();
         }
@@ -124,10 +124,10 @@ public partial class MainWindow : Window
 
     private void OnFromPositionSelected(Square pos)
     {
-        IEnumerable<Move> moves = gameState.LegalMovesForPiece(pos);
+        IEnumerable<Move> moves = _gameState.LegalMovesForPiece(pos);
         if (moves.Any())
         {
-            selectedPos = pos;
+            _selectedCasilla = pos;
             CacheMoves(moves);
             ShowHighlights();
         }
@@ -142,27 +142,27 @@ public partial class MainWindow : Window
     }
     private void CacheMoves(IEnumerable<Move> moves)
     {
-        moveCache.Clear();
+        _moveCache.Clear();
         foreach (Move move in moves)
         {
-            moveCache[move.ToPos] = move;
+            _moveCache[move.ToPos] = move;
         }
     }
 
     private void ShowHighlights()
     {
         Color color = Color.FromArgb(150, 125, 255, 125);
-        foreach (Square to in moveCache.Keys)
+        foreach (Square to in _moveCache.Keys)
         {
-            highlights[to.Row, to.Column].Fill = new SolidColorBrush(color);
+            _highlights[to.Row, to.Column].Fill = new SolidColorBrush(color);
         }
     }
 
     private void HideHighlights()
     {
-        foreach (Square to in moveCache.Keys)
+        foreach (Square to in _moveCache.Keys)
         {
-            highlights[to.Row, to.Column].Fill = Brushes.Transparent;
+            _highlights[to.Row, to.Column].Fill = Brushes.Transparent;
         }
     }
 
@@ -185,7 +185,7 @@ public partial class MainWindow : Window
 
     private void ShowGameOver()
     {
-        GameOverMenu gameOverMenu = new GameOverMenu(gameState);
+        GameOverMenu gameOverMenu = new GameOverMenu(_gameState);
         MenuContainer.Content = gameOverMenu;
 
         gameOverMenu.OptionSelected += option =>
@@ -204,12 +204,12 @@ public partial class MainWindow : Window
 
     private void RestartGame()
     {
-        selectedPos = null;
+        _selectedCasilla = null;
         HideHighlights();
-        moveCache.Clear();
-        gameState = new GameState(Player.White, Board.Initial());
-        DrawBoard(gameState.Board);
-        SetCursor(gameState.CurrentPlayer);
+        _moveCache.Clear();
+        _gameState = new GameState(Player.White, Board.Initial());
+        DrawBoard(_gameState.Board);
+        SetCursor(_gameState.CurrentPlayer);
     }
 
     private void Window_KeyDown(object sender, KeyEventArgs e)
