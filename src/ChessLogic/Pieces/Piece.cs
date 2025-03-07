@@ -8,19 +8,19 @@ public abstract class Piece
     public abstract IEnumerable<Move> GetMoves(Square from, Board board);
     protected IEnumerable<Square> MovePositionInDir(Square from, Board board, Direction dir)
     {
-        for(Square pos = from + dir; Board.IsInside(pos); pos += dir)
+        for(Square cas = from + dir; Board.IsInside(cas); cas += dir)
         {
-            if (board.IsEmpty(pos))
+            if (board.IsEmpty(cas))
             {
-                yield return pos;
+                yield return cas;
                 continue;
             }
             
-            Piece piece = board[pos];
+            Piece piece = board[cas];
             
             if(piece.Color != Color)
             {
-                yield return pos;
+                yield return cas;
             }
 
             yield break;
@@ -35,7 +35,7 @@ public abstract class Piece
     {
         return GetMoves(from, board).Any(move =>
         {
-            Piece piece = board[move.ToPos];
+            Piece piece = board[move.ToCasilla];
             return piece != null && piece.Type == PieceType.King;
         });
     }

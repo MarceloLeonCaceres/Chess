@@ -105,7 +105,7 @@ public class Pawn : Piece
     {
         return DiagonalMoves(from, board).Any(move =>
         {
-            Piece piece = board[move.ToPos];
+            Piece piece = board[move.ToCasilla];
             return piece != null && piece.Type == PieceType.King;
         });
     }
