@@ -85,7 +85,7 @@ public partial class MainWindow : Window
         {
             if(move.Type == MoveType.PawnPromotion)
             {
-                HandlePromotion(move.FromPos, move.ToPos);
+                HandlePromotion(move.FromCasilla, move.ToCasilla);
             }
             else
             {
@@ -145,7 +145,7 @@ public partial class MainWindow : Window
         _moveCache.Clear();
         foreach (Move move in moves)
         {
-            _moveCache[move.ToPos] = move;
+            _moveCache[move.ToCasilla] = move;
         }
     }
 

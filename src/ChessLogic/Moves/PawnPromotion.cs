@@ -3,20 +3,20 @@ public class PawnPromotion : Move
 {
     public override MoveType Type => MoveType.PawnPromotion;
 
-    public override Square FromPos { get; }
+    public override Square FromCasilla { get; }
 
-    public override Square ToPos { get; }
+    public override Square ToCasilla { get; }
 
-    private readonly PieceType newType;
+    private readonly PieceType _newType;
     public PawnPromotion(Square from, Square to, PieceType newType)
     {
-        FromPos = from;
-        ToPos = to;
-        this.newType = newType;
+        FromCasilla = from;
+        ToCasilla = to;
+        this._newType = newType;
     }
     private Piece CreatePromotionPiece(Player color)
     {
-        return newType switch
+        return _newType switch
         {
             PieceType.Knight => new Knight(color),
             PieceType.Bishop => new Bishop(color),
@@ -26,12 +26,12 @@ public class PawnPromotion : Move
     }
     public override bool Execute(Board board)
     {
-        Piece pawn = board[FromPos];
-        board[FromPos] = null;
+        Piece pawn = board[FromCasilla];
+        board[FromCasilla] = null;
 
         Piece promotionPiece = CreatePromotionPiece(pawn.Color);
         promotionPiece.HasMoved = true;
-        board[ToPos] = promotionPiece;
+        board[ToCasilla] = promotionPiece;
 
         return true;
     }

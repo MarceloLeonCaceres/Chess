@@ -3,9 +3,9 @@ public class Castle : Move
 {
     public override MoveType Type { get; }
 
-    public override Square FromPos { get; }
+    public override Square FromCasilla { get; }
 
-    public override Square ToPos { get; }
+    public override Square ToCasilla { get; }
 
     private readonly Direction kingMoveDir;
     private readonly Square rookFromPos;
@@ -14,33 +14,33 @@ public class Castle : Move
     public Castle(MoveType type, Square kingPos)
     {
         Type = type;
-        FromPos = kingPos;
+        FromCasilla = kingPos;
             
         if(type == MoveType.CastleKS)
         {
             kingMoveDir = Direction.East;
-            ToPos = new Square(kingPos.Row, 6);
+            ToCasilla = new Square(kingPos.Row, 6);
             rookFromPos = new Square(kingPos.Row, 7);
             rookToPos = new Square(kingPos.Row, 5);
         }
         else
         {
             kingMoveDir = Direction.West;
-            ToPos = new Square(kingPos.Row, 2);
+            ToCasilla = new Square(kingPos.Row, 2);
             rookFromPos = new Square(kingPos.Row, 0);
             rookToPos = new Square(kingPos.Row, 3);
         }
     }
     public override bool Execute(Board board)
     {
-        new NormalMove(FromPos, ToPos).Execute(board);
+        new NormalMove(FromCasilla, ToCasilla).Execute(board);
         new NormalMove(rookFromPos, rookToPos).Execute(board);
 
         return false;
     }
     public override bool IsLegal(Board board)
     {
-        Player player = board[FromPos].Color;
+        Player player = board[FromCasilla].Color;
 
         if (board.IsInCheck(player))
         {
@@ -48,7 +48,7 @@ public class Castle : Move
         }
 
         Board copy = board.Copy();
-        Square kingPosInCopy = FromPos;
+        Square kingPosInCopy = FromCasilla;
 
         for(int i = 0; i < 2; i++)
         {

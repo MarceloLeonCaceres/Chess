@@ -23,6 +23,7 @@ public class Rook : Piece
     }
     public override IEnumerable<Move> GetMoves(Square from, Board board)
     {
-        return MovePositionsInDirs(from, board, dirs).Select(to => new NormalMove(from, to));
+        return MovePositionsInDirs(from, board, dirs)
+            .Select(to => new NormalMove(from, to));
     }
 }
