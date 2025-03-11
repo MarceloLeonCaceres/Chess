@@ -5,28 +5,111 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ChessUI"
         mc:Ignorable="d"
-        Title="Chess"  Width="600" SizeToContent="Height"
+        Title="Chess" Width="675" Height="675"
         Icon="Assets/icon.ico"
         WindowStartupLocation="CenterScreen"
         Background="Black"
         KeyDown="Window_KeyDown">
     <Viewbox>
-        <Grid x:Name="BoardGrid"
-              Width="600"
-              Height="600"
+        <Grid x:Name="MainGrid" Width="675" Height="675">
+            <!-- Define rows and columns for the chessboard and labels -->
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <!-- Chessboard rows -->
+                <RowDefinition Height="Auto"/>
+                <!-- Column labels row -->
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <!-- Chessboard columns -->
+                <ColumnDefinition Width="Auto"/>
+                <!-- Row labels column -->
+            </Grid.ColumnDefinitions>
+
+            <!-- Chessboard Grid -->
+            <Grid x:Name="BoardGrid"
+              Grid.Row="0" Grid.Column="0"
+              Width="600" Height="600"
               MouseDown="BoardGrid_MouseDown">
-            <Grid.Background>
-                <ImageBrush ImageSource="Assets/Board.png"/>
-            </Grid.Background>
-            <UniformGrid x:Name="HighlightGrid"
+                <Grid.Background>
+                    <ImageBrush ImageSource="Assets/Board.png" Stretch="UniformToFill"/>
+                </Grid.Background>
+                <UniformGrid x:Name="HighlightGrid"
                          Rows="8" Columns="8">
-            </UniformGrid>
-            <UniformGrid x:Name="PieceGrid" 
+                </UniformGrid>
+                <UniformGrid x:Name="PieceGrid" 
                          Rows="8" Columns="8"
                          RenderOptions.BitmapScalingMode="HighQuality">
-            </UniformGrid>
+                </UniformGrid>
+            </Grid>
 
-            <ContentControl x:Name="MenuContainer"/>
+            <!-- Column Labels (a-h) -->
+            <Grid x:Name="ColumnLabels"
+              Grid.Row="1" Grid.Column="0"
+              HorizontalAlignment="Center"
+              VerticalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="75"/>
+                    <!-- a -->
+                    <ColumnDefinition Width="75"/>
+                    <!-- b -->
+                    <ColumnDefinition Width="75"/>
+                    <!-- c -->
+                    <ColumnDefinition Width="75"/>
+                    <!-- d -->
+                    <ColumnDefinition Width="75"/>
+                    <!-- e -->
+                    <ColumnDefinition Width="75"/>
+                    <!-- f -->
+                    <ColumnDefinition Width="75"/>
+                    <!-- g -->
+                    <ColumnDefinition Width="75"/>
+                    <!-- h -->
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="a" Grid.Column="0" Style="{StaticResource TextStyle}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <TextBlock Text="b" Grid.Column="1" Style="{StaticResource TextStyle}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <TextBlock Text="c" Grid.Column="2" Style="{StaticResource TextStyle}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <TextBlock Text="d" Grid.Column="3" Style="{StaticResource TextStyle}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <TextBlock Text="e" Grid.Column="4" Style="{StaticResource TextStyle}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <TextBlock Text="f" Grid.Column="5" Style="{StaticResource TextStyle}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <TextBlock Text="g" Grid.Column="6" Style="{StaticResource TextStyle}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <TextBlock Text="h" Grid.Column="7" Style="{StaticResource TextStyle}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Grid>
+
+            <!-- Row Labels (8-1) -->
+            <Grid x:Name="RowLabels"
+              Grid.Row="0" Grid.Column="1"
+              HorizontalAlignment="Center"
+              VerticalAlignment="Center">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="75"/>
+                    <!-- 8 -->
+                    <RowDefinition Height="75"/>
+                    <!-- 7 -->
+                    <RowDefinition Height="75"/>
+                    <!-- 6 -->
+                    <RowDefinition Height="75"/>
+                    <!-- 5 -->
+                    <RowDefinition Height="75"/>
+                    <!-- 4 -->
+                    <RowDefinition Height="75"/>
+                    <!-- 3 -->
+                    <RowDefinition Height="75"/>
+                    <!-- 2 -->
+                    <RowDefinition Height="75"/>
+                    <!-- 1 -->
+                </Grid.RowDefinitions>
+                <TextBlock Text="8" Grid.Row="0" Style="{StaticResource TextStyle}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <TextBlock Text="7" Grid.Row="1" Style="{StaticResource TextStyle}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <TextBlock Text="6" Grid.Row="2" Style="{StaticResource TextStyle}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <TextBlock Text="5" Grid.Row="3" Style="{StaticResource TextStyle}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <TextBlock Text="4" Grid.Row="4" Style="{StaticResource TextStyle}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <TextBlock Text="3" Grid.Row="5" Style="{StaticResource TextStyle}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <TextBlock Text="2" Grid.Row="6" Style="{StaticResource TextStyle}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <TextBlock Text="1" Grid.Row="7" Style="{StaticResource TextStyle}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Grid>
+
+            <ContentControl x:Name="MenuContainer" Grid.Row="0" Grid.Column="0"/>
         </Grid>
     </Viewbox>
 </Window>

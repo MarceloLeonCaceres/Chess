@@ -135,9 +135,18 @@ public partial class MainWindow : Window
 
     private Square ToSquarePosition(Point point)
     {
-        double squareSize = BoardGrid.ActualWidth / 8;
-        int row = (int)(point.Y / squareSize);
-        int col = (int)(point.X / squareSize);
+        // Calculate the scaling factor introduced by the Viewbox
+        double scaleX = BoardGrid.ActualWidth / 600; // 600 is the original width of the BoardGrid
+        double scaleY = BoardGrid.ActualHeight / 600; // 600 is the original height of the BoardGrid
+
+        // Adjust the mouse position for scaling
+        double adjustedX = point.X / scaleX;
+        double adjustedY = point.Y / scaleY;
+
+        // Calculate the square size based on the original BoardGrid size
+        double squareSize = 600 / 8; // Each square is 75x75 in the original size
+        int row = (int)(adjustedY / squareSize);
+        int col = (int)(adjustedX / squareSize);
         return new Square(row, col);
     }
     private void CacheMoves(IEnumerable<Move> moves)
@@ -235,4 +244,5 @@ public partial class MainWindow : Window
             }
         };
     }
+
 }
