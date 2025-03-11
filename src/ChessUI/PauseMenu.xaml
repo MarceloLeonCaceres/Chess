@@ -15,9 +15,10 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <TextBlock Grid.ColumnSpan="2"
+            <TextBlock Grid.ColumnSpan="3"
                        Text="RESTART GAME?"
                        Style="{StaticResource TextStyle}"
                        FontSize="28"/>
@@ -35,6 +36,13 @@
                     Width="80"
                     Height="30" 
                     Click="Restart_Click"/>
+            <Button Grid.Row="2"
+                    Grid.Column="2"
+                    Content="FLIP"
+                    Style="{StaticResource ButtonStyle}"
+                    Width="80"
+                    Height="30" 
+                    Click="Flip_Click"/>
         </Grid>
     </Border>
 </UserControl>

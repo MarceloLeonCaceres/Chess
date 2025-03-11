@@ -32,8 +32,8 @@ public class Board
     public static Board Initial()
     {
         Board board = new Board();
-        //board.AddStartPieces();
-        board.Ejercicio_1();
+        board.AddStartPieces();
+        //board.Ejercicio_1();
         return board;
     }
     public void Ejercicio_1()

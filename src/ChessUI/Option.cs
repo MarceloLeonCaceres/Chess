@@ -3,5 +3,6 @@ public enum Option
 {
     Restart,
     Exit,
-    Continue
+    Continue,
+    Flip
 }

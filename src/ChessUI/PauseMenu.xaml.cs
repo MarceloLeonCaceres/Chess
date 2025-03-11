@@ -22,4 +22,9 @@ public partial class PauseMenu : UserControl
     {
         OptionSelected?.Invoke(Option.Restart);
     }
+
+    private void Flip_Click(object sender, RoutedEventArgs e)
+    {
+        OptionSelected?.Invoke(Option.Flip);
+    }
 }

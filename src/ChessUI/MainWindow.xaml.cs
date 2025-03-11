@@ -18,6 +18,8 @@ public partial class MainWindow : Window
     private GameState _gameState;
     private Square _selectedCasilla = null;
 
+    private bool _isFlipped = false;
+
     public MainWindow()
     {
         InitializeComponent();
@@ -51,6 +53,10 @@ public partial class MainWindow : Window
         {
             for (int c = 0; c < 8; c++)
             {
+                // Determine the actual board position based on flip state
+                int boardRow = _isFlipped ? 7 - r : r;
+                int boardCol = _isFlipped ? 7 - c : c;
+
                 Piece piece = board[r, c];
                 _pieceImages[r, c].Source = Images.GetImage(piece);
             }
@@ -147,6 +153,14 @@ public partial class MainWindow : Window
         double squareSize = 600 / 8; // Each square is 75x75 in the original size
         int row = (int)(adjustedY / squareSize);
         int col = (int)(adjustedX / squareSize);
+
+        // Invert coordinates if board is flipped
+        if (_isFlipped)
+        {
+            row = 7 - row;
+            col = 7 - col;
+        }
+
         return new Square(row, col);
     }
     private void CacheMoves(IEnumerable<Move> moves)
@@ -163,7 +177,8 @@ public partial class MainWindow : Window
         Color color = Color.FromArgb(150, 125, 255, 125);
         foreach (Square to in _moveCache.Keys)
         {
-            _highlights[to.Row, to.Column].Fill = new SolidColorBrush(color);
+            var (uiRow, uiCol) = ToUiPosition(to);
+            _highlights[uiRow, uiCol].Fill = new SolidColorBrush(color);
         }
     }
 
@@ -171,10 +186,22 @@ public partial class MainWindow : Window
     {
         foreach (Square to in _moveCache.Keys)
         {
-            _highlights[to.Row, to.Column].Fill = Brushes.Transparent;
+            var (uiRow, uiCol) = ToUiPosition(to);
+            _highlights[uiRow, uiCol].Fill = Brushes.Transparent;
         }
     }
-
+    public void ForceHideAllHighlights()
+    {
+        for (int r = 0; r < 8; r++)
+        {
+            for (int c = 0; c < 8; c++)
+            {
+                _highlights[r, c].Fill = Brushes.Transparent;
+            }
+        }
+        _moveCache.Clear();
+        _selectedCasilla = null;
+    }
     private void SetCursor(Player player)
     {
         if (player == Player.White)
@@ -242,7 +269,66 @@ public partial class MainWindow : Window
             {
                 RestartGame();
             }
+            else if(option == Option.Flip)
+            {
+                FlipBoardTablero();
+            }
         };
     }
 
+    private (int uiRow, int uiCol) ToUiPosition(Square chessSquare)
+    {
+        return (chessSquare.Row, chessSquare.Column);
+    }
+
+    private void FlipBoardTablero()
+    {
+        _isFlipped = !_isFlipped;
+
+        ForceHideAllHighlights();
+
+        // Reverse the order of the PieceGrid and HighlightGrid children
+        ReverseGridChildren(PieceGrid);
+        ReverseGridChildren(HighlightGrid);
+
+        // Reverse row labels (1-8 <-> 8-1)
+        ReverseRowLabels();
+
+        // Reverse column labels (a-h <-> h-a)
+        ReverseColumnLabels();
+    }
+
+    private void ReverseGridChildren(Panel grid)
+    {
+        var children = grid.Children.Cast<UIElement>().ToList();
+        grid.Children.Clear();
+        children.Reverse();  // Reverse the order
+        foreach (var child in children)
+        {
+            grid.Children.Add(child);
+        }
+    }
+    private void ReverseRowLabels()
+    {
+        var rowLabels = RowLabels.Children.Cast<TextBlock>().ToList();
+        RowLabels.Children.Clear();
+        rowLabels.Reverse(); // Flip the row labels (1-8 <-> 8-1)
+        for (int i = 0; i < rowLabels.Count; i++)
+        {
+            Grid.SetRow(rowLabels[i], i);
+            RowLabels.Children.Add(rowLabels[i]);
+        }
+    }
+
+    private void ReverseColumnLabels()
+    {
+        var colLabels = ColumnLabels.Children.Cast<TextBlock>().ToList();
+        ColumnLabels.Children.Clear();
+        colLabels.Reverse(); // Flip the column labels (a-h <-> h-a)
+        for (int i = 0; i < colLabels.Count; i++)
+        {
+            Grid.SetColumn(colLabels[i], i);
+            ColumnLabels.Children.Add(colLabels[i]);
+        }
+    }
 }
