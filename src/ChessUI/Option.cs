@@ -4,5 +4,6 @@ public enum Option
     Restart,
     Exit,
     Continue,
-    Flip
+    Flip,
+    Undo
 }
