@@ -27,4 +27,9 @@ public partial class PauseMenu : UserControl
     {
         OptionSelected?.Invoke(Option.Flip);
     }
+
+    private void Undo_Click(object sender, RoutedEventArgs e)
+    {
+        OptionSelected?.Invoke(Option.Undo);
+    }
 }
