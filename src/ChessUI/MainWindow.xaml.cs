@@ -273,6 +273,18 @@ public partial class MainWindow : Window
             {
                 FlipBoardTablero();
             }
+            else if (option == Option.Undo)
+            {
+                if (_gameState.UndoMove())
+                {
+                    DrawBoard(_gameState.Board);
+                    SetCursor(_gameState.CurrentPlayer);
+                }
+                else
+                {
+                    MessageBox.Show("No hay movidas para regresar.", "Regresar movimientos.");
+                }
+            }
         };
     }
 
