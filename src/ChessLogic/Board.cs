@@ -122,6 +122,25 @@ public class Board
         return copy;
     }
 
+    public void CopyFrom(Board other)
+    {
+        for (int r = 0; r < 8; r++)
+        {
+            for (int c = 0; c < 8; c++)
+            {
+                this[r, c] = other[r, c];
+            }
+        }
+
+        // Copy additional board state (e.g., castling rights, en passant)
+        //this.CastleRightKS(Player.White) = other.CastleRightKS(Player.White);
+        //this.CastleRightQSWhite = other.CastleRightQSWhite;
+        //this.CastleRightKSBlack = other.CastleRightKSBlack;
+        //this.CastleRightQSBlack = other.CastleRightQSBlack;
+        //this.PawnSkipPositionWhite = other.PawnSkipPositionWhite;
+        //this.PawnSkipPositionBlack = other.PawnSkipPositionBlack;
+    }
+
     public Counting CountPieces()
     {
         Counting counting = new Counting();
