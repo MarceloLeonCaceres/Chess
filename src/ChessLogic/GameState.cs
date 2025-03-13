@@ -1,4 +1,6 @@
-﻿namespace ChessLogic;
+﻿using System.Collections.Generic;
+
+namespace ChessLogic;
 public class GameState
 {
     public Board Board { get; }
@@ -8,6 +10,7 @@ public class GameState
     private int _noCaptureOrPawnMoves = 0;
     private string _stateString;
     private readonly Dictionary<string, int> _stateHistory = new Dictionary<string, int>();
+    private readonly Stack<(Board Board, Player CurrentPlayer, string StateString)> _moveHistory = new();
 
     public GameState(Player player, Board board)
     {
@@ -31,6 +34,8 @@ public class GameState
 
     public void MakeMove(Move move)
     {
+        _moveHistory.Push((Board.Copy(), CurrentPlayer, _stateString));
+
         Board.SetPawnSkipPosition(CurrentPlayer, null);
         bool captureOrPawn = move.Execute(Board);
 
@@ -49,7 +54,33 @@ public class GameState
         UpdateStateString();
         CheckForGameOver();
     }
+    public bool UndoMove()
+    {
+        if (_moveHistory.Count == 0)
+        {
+            return false; // No moves to undo
+        }
 
+        // Pop the previous state from the stack
+        var (previousBoard, previousPlayer, previousStateString) = _moveHistory.Pop();
+
+        // Restore the previous state
+        Board.CopyFrom(previousBoard);
+        CurrentPlayer = previousPlayer;
+        _stateString = previousStateString;
+
+        // Update state history
+        if (!_stateHistory.ContainsKey(_stateString))
+        {
+            _stateHistory[_stateString] = 1;
+        }
+        else
+        {
+            _stateHistory[_stateString]++;
+        }
+
+        return true;
+    }
     public IEnumerable<Move> AllLegalMovesFor(Player player)
     {
         IEnumerable<Move> moveCandidates = Board.PiecePositionsFor(player).SelectMany(pos =>
