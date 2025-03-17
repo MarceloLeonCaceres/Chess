@@ -5,6 +5,21 @@ public abstract class Piece
     public abstract Player Color { get; }
     public bool HasMoved { get; set; } = false;
     public abstract Piece Copy();
+
+    // Factory method to create pieces
+    public static Piece Create(PieceType type, Player color)
+    {
+        return type switch
+        {
+            PieceType.Pawn => new Pawn(color),
+            PieceType.Knight => new Knight(color),
+            PieceType.Bishop => new Bishop(color),
+            PieceType.Rook => new Rook(color),
+            PieceType.Queen => new Queen(color),
+            PieceType.King => new King(color),
+            _ => throw new ArgumentException("Invalid piece type"),
+        };
+    }
     public abstract IEnumerable<Move> GetMoves(Square from, Board board);
     protected IEnumerable<Square> MovePositionInDir(Square from, Board board, Direction dir)
     {
