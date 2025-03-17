@@ -1,4 +1,5 @@
 ﻿using ChessLogic;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -67,21 +68,51 @@ public partial class MainWindow : Window
     {
         if (IsMenuOnScreen())
         {
-            return;
+            return; // Ignore clicks if a menu is open
         }
 
         Point point = e.GetPosition(BoardGrid);
         Square pos = ToSquarePosition(point);
-        if (_selectedCasilla == null)
+
+        if (IsSettingPositionMode)
         {
-            OnFromPositionSelected(pos);
+            HighlightSquare(pos);
+            // Handle piece placement in position-setting mode
+            ShowPieceSelectionMenu(pos);
         }
         else
         {
-            OnToPositionSelected(pos);
+            // Handle normal move logic
+            if (_selectedCasilla == null)
+            {
+                OnFromPositionSelected(pos);
+            }
+            else
+            {
+                OnToPositionSelected(pos);
+            }
         }
     }
 
+    private void HighlightSquare(Square square)
+    {
+        ClearHighlights();
+
+        int uiRow = _isFlipped ? 7 - square.Row : square.Row;
+        int uiCol = _isFlipped ? 7 - square.Column : square.Column;
+
+        _highlights[uiRow, uiCol].Fill = new SolidColorBrush(Colors.Yellow);
+    }
+    private void ClearHighlights()
+    {
+        for (int r = 0; r < 8; r++)
+        {
+            for (int c = 0; c < 8; c++)
+            {
+                _highlights[r, c].Fill = Brushes.Transparent;
+            }
+        }
+    }
     private void OnToPositionSelected(Square pos)
     {
         _selectedCasilla = null;
@@ -254,6 +285,10 @@ public partial class MainWindow : Window
         {
             ShowPauseMenu();
         }
+        else if(e.Key == Key.Z && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+        {
+            UndoLastMove();
+        }
     }
 
     private void ShowPauseMenu()
@@ -275,17 +310,22 @@ public partial class MainWindow : Window
             }
             else if (option == Option.Undo)
             {
-                if (_gameState.UndoMove())
-                {
-                    DrawBoard(_gameState.Board);
-                    SetCursor(_gameState.CurrentPlayer);
-                }
-                else
-                {
-                    MessageBox.Show("No hay movidas para regresar.", "Regresar movimientos.");
-                }
+                UndoLastMove();
             }
         };
+    }
+
+    private void UndoLastMove()
+    {
+        if (_gameState.UndoMove())
+        {
+            DrawBoard(_gameState.Board);
+            SetCursor(_gameState.CurrentPlayer);
+        }
+        else
+        {
+            MessageBox.Show("No hay movidas para regresar.", "Regresar movimientos.", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
     }
 
     private (int uiRow, int uiCol) ToUiPosition(Square chessSquare)
@@ -342,5 +382,102 @@ public partial class MainWindow : Window
             Grid.SetColumn(colLabels[i], i);
             ColumnLabels.Children.Add(colLabels[i]);
         }
+    }
+
+
+    private void ShowPieceSelectionMenu(Square square)
+    {
+        var pieceSelectionMenu = new PieceSelectionMenu(Player.White);
+        MenuContainer.Content = pieceSelectionMenu;
+
+        pieceSelectionMenu.PieceSelected += (pieceType, color) =>
+        {
+            // Place the selected piece on the board
+            Piece piece = Piece.Create(pieceType, color);
+            _gameState.Board[square.Row, square.Column] = piece;
+
+            // Redraw the board
+            DrawBoard(_gameState.Board);
+
+            // Close the menu
+            MenuContainer.Content = null;
+        };
+
+        pieceSelectionMenu.ClearSquareRequested += () =>
+        {
+            _gameState.Board[square.Row, square.Column] = null;
+            DrawBoard(_gameState.Board);
+            MenuContainer.Content = null;
+        };
+
+        pieceSelectionMenu.Closed += () =>
+        {
+            _gameState.CurrentPlayer = pieceSelectionMenu.CurrentPlayer;
+            SetCursor(_gameState.CurrentPlayer);
+            DrawBoard(_gameState.Board);
+        };
+    }
+
+
+    private bool IsSettingPositionMode = false;
+
+    private void TogglePositionSettingMode(object sender, RoutedEventArgs e)
+    {
+        IsSettingPositionMode = !IsSettingPositionMode;
+
+        this.Background = IsSettingPositionMode
+            ? new SolidColorBrush(Colors.LightGray)
+            : new SolidColorBrush(Colors.Black);
+
+        var setPositionButton = (Button)sender;
+        setPositionButton.Content = IsSettingPositionMode ? "Set Position Off" : "Set Position On";
+
+        if (IsSettingPositionMode)
+        {
+            MessageBox.Show("Position-setting mode enabled. \nClick on squares to place pieces.", 
+                "Modo armar posicion", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+        else
+        {
+            ClearHighlights();
+            MessageBox.Show("Position-setting mode disabled.", 
+                "Modo armar posicion", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+    }
+    private void ClearBoard(object sender, RoutedEventArgs e)
+    {
+        _gameState.Board.Clear();
+
+        // Reset game state
+        _gameState = new GameState(Player.White, _gameState.Board);
+
+        DrawBoard(_gameState.Board);
+
+        if (IsSettingPositionMode)
+        {
+            this.Background = new SolidColorBrush(Colors.Black);
+            IsSettingPositionMode = false;
+            SetPositionButton.Content = "Set Position On";
+        }
+
+        // Reset UI elements
+        SetCursor(_gameState.CurrentPlayer);
+        HideHighlights();
+        ClearHighlights();
+    }
+    private void SavePosition(string filePath)
+    {
+        string positionString = new StateString(_gameState.CurrentPlayer, _gameState.Board).ToString();
+        File.WriteAllText(filePath, positionString);
+    }
+    private void LoadPosition(string filePath)
+    {
+        string positionString = File.ReadAllText(filePath);
+        // Implement logic to parse the position string and set up the board
+    }
+
+    private void NewGame(object sender, RoutedEventArgs e)
+    {
+        RestartGame();
     }
 }

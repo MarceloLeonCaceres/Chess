@@ -10,6 +10,7 @@
         WindowStartupLocation="CenterScreen"
         Background="Black"
         KeyDown="Window_KeyDown">
+    <!--<SolidColorBrush x:Name="BoardBackground" Color="Black"/>-->
     <Viewbox>
         <Grid x:Name="MainGrid" Width="675" Height="675">
             <!-- Define rows and columns for the chessboard and labels -->
@@ -18,6 +19,8 @@
                 <!-- Chessboard rows -->
                 <RowDefinition Height="Auto"/>
                 <!-- Column labels row -->
+                <RowDefinition Height="Auto"/>
+                <!-- Buttons row -->
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
@@ -109,7 +112,19 @@
                 <TextBlock Text="1" Grid.Row="7" Style="{StaticResource TextStyle}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Grid>
 
+            <!-- Menu Container -->
             <ContentControl x:Name="MenuContainer" Grid.Row="0" Grid.Column="0"/>
+
+            <!-- Buttons Row -->
+            <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" 
+                        Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
+                <Button x:Name="SetPositionButton" Content="Set Position On" Click="TogglePositionSettingMode" 
+                        Style="{StaticResource ButtonStyle}" Margin="5" Width="100"/>
+                <Button Content="Clear Board" Click="ClearBoard" 
+                        Style="{StaticResource ButtonStyle}" Margin="5" Width="100"/>
+                <Button Content="New Game" Click="NewGame" 
+                        Style="{StaticResource ButtonStyle}" Margin="5" Width="100"/>
+            </StackPanel>
         </Grid>
     </Viewbox>
 </Window>
