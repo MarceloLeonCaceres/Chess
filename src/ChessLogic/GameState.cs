@@ -4,7 +4,7 @@ namespace ChessLogic;
 public class GameState
 {
     public Board Board { get; }
-    public Player CurrentPlayer { get; private set; }
+    public Player CurrentPlayer { get; set; }
     public Result Result { get; private set; } = null;
 
     private int _noCaptureOrPawnMoves = 0;
